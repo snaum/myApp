@@ -3,20 +3,27 @@ const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
+const session  = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
 const bodyParser = require('body-parser');
 const compression = require('compression');
 
 //security, helmet for safe headers, csurf for CSRF, passport for authentication
 const helmet = require('helmet');
 const csurf = require('csurf');
+
+var mongoose = require('mongoose');
 const passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
+
 
 //logging morgan for http request and response, winston for log statements
 const winston = require('winston');
 winston.info("CHILL WINSTON! ... I put it in the logs.");
-/*  For prod enable Redis and rate limited for DOS protection
 
+/*  For prod enable Redis and rate limited for DOS protection
 var client = require('redis').createClient();
 var limiter = require('express-limiter')(app, client);
 
@@ -29,7 +36,17 @@ limiter({
   expire: 1000 * 60 * 60
 })
 */
+
 const app = express();
+
+app.use(session({ 
+//  store: new RedisStore(options),
+  secret: 'GdkDn5Zilu4zvBLmWJ0pIFvdclTwl9mXnU0aXAxIT6cCWnWbqkWyzjQzIdEwWSdx',
+  resave: true, 
+  saveUninitialized: true 
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,9 +63,17 @@ app.use(compression());
 app.use(favicon(path.join(__dirname, 'ui', 'favicon-96x96.png')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'ui')));
+//app.use(express.static(path.join(__dirname, 'ui')));
 
+
+
+
+var Account = require('./components/accounts/account');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
+
+mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
 
 /*
