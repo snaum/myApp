@@ -3,7 +3,7 @@
 const express = require('express');
 
 const RequestContext = require('../../requestContext');
-const User = require('../users/user');
+const User = require('./user');
 
 let router = express.Router();
 

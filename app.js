@@ -1,10 +1,17 @@
-'use strict'
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
+
+//logging morgan for http request and response, winston for log statements
+//TODO: why???
+const winston = require('winston');
+winston.info("CHILL WINSTON! ... I put it in the logs.");
 const logger = require('morgan');
+
+//TODO: session management with Redis
 const session  = require('express-session');
 var RedisStore = require('connect-redis')(session);
+var mongoose = require('mongoose');
 
 const bodyParser = require('body-parser');
 const compression = require('compression');
@@ -13,17 +20,13 @@ const compression = require('compression');
 const helmet = require('helmet');
 const csurf = require('csurf');
 
-var mongoose = require('mongoose');
-const passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
 
 
 
-//logging morgan for http request and response, winston for log statements
-const winston = require('winston');
-winston.info("CHILL WINSTON! ... I put it in the logs.");
 
-/*  For prod enable Redis and rate limited for DOS protection
+
+
+/*  TODO: For prod enable Redis and rate limited for DOS protection
 var client = require('redis').createClient();
 var limiter = require('express-limiter')(app, client);
 
@@ -39,6 +42,14 @@ limiter({
 
 const app = express();
 
+
+
+
+
+/* AUTHENTICATION */
+
+const passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 app.use(session({ 
 //  store: new RedisStore(options),
   secret: 'GdkDn5Zilu4zvBLmWJ0pIFvdclTwl9mXnU0aXAxIT6cCWnWbqkWyzjQzIdEwWSdx',
@@ -48,16 +59,52 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+let authNHelper = require('./helpers/authNHelper');
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    /*
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (!user.verifyPassword(password)) { return done(null, false); }
+      return done(null, user);
+    });
+    */
+    return authNHelper.authenticate(username, password, done);
+  }
+));
+passport.serializeUser(authNHelper.serializeUser);
+passport.deserializeUser(authNHelper.deserializeUser);
+
+
+/*
+TODO: is this DEAD code yet?
+var Account = require('./components/accounts/account');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
+*/
+
+
+//mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
+
+mongoose.connect('mongodb://localhost/newLocalTest');
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 //secure headers
-app.use(helmet())
-//generates a CSRF token for use in API and UI forms
+app.use(helmet());
+//TODO generates a CSRF token for use in API and UI forms
 //app.use(csrf({ cookie: true }))
-//http request/response logging using morgan
+
+//TODO: http request/response logging using morgan
 app.use(logger('combined'));
+
 app.use(compression());
 
 app.use(favicon(path.join(__dirname, 'ui', 'favicon-96x96.png')));
@@ -65,15 +112,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(express.static(path.join(__dirname, 'ui')));
 
-
-
-
-var Account = require('./components/accounts/account');
-passport.use(new LocalStrategy(Account.authenticate()));
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
-
-mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
 
 /*
