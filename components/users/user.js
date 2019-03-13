@@ -26,18 +26,18 @@ function createUser(email, password, firstname, lastname, screename, language, p
 */
 
 class User{
-    constructor(id, email, password, firstname, lastname, screename, language, phone){
+    constructor(email, password, firstname, lastname, screenname, language, phone){
         validEmail(email);
 
-        this.id = id;
         this.email = email;
         this.password = password;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.screenname = screename;
+        this.screenname = screenname;
         this.language = language;
         this.phone = phone;
 
+        this.id;
         this.private; //other private
     }
 
@@ -55,6 +55,14 @@ class User{
 
     getEmail(){
         return this.email;
+    }
+
+    getId(){
+        return this.id;
+    }
+
+    setId(id){
+        this.id = id;
     }
 
 }

@@ -15,12 +15,12 @@ function authenticate(email, password, done){
     });
 }
 
-function register(user){
-    console.log("saving..."+JSON.stringify(user));
+function register(userObj){
+    console.log("saving..."+JSON.stringify(userObj));
     var p = new Promise(function(resolve, reject){
-        userDao.create(user).then(function(result){
-            console.log("saved:"+JSON.stringify(result));
-            resolve(result);
+        userDao.create(userObj).then(function(newUser){
+            console.log("saved:"+JSON.stringify(newUser));
+            resolve(newUser);
         }, function(err){
             console.error(err);
             resolve(err);
@@ -37,7 +37,7 @@ function validatePassword(user, password){
 
 function serializeUser(user, done){
     console.log("...serializeUser...");
-    done(null, user.id);
+    done(null, user.getId());
 }
 function deserializeUser(id, done){
     console.log("...deserializeUser...");

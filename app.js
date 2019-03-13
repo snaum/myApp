@@ -5,11 +5,9 @@ const path = require('path');
 const favicon = require('serve-favicon');
 
 //morgan logs http request and response (access log), winston for log statements (debug, info, error...)
-//TODO: why???
 const winston = require('winston');
 winston.info("CHILL WINSTON! ... I put it in the logs.");
 const logger = require('morgan');
-//TODO: http request/response logging using morgan
 app.use(logger('combined'));
 
 
@@ -24,9 +22,6 @@ const compression = require('compression');
 //security, helmet for safe headers, csurf for CSRF, passport for authentication
 const helmet = require('helmet');
 const csurf = require('csurf');
-
-
-
 
 
 
@@ -83,19 +78,11 @@ passport.serializeUser(authNHelper.serializeUser);
 passport.deserializeUser(authNHelper.deserializeUser);
 
 
-/*
-TODO: is this DEAD code yet?
-var Account = require('./components/accounts/account');
-passport.use(new LocalStrategy(Account.authenticate()));
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
-*/
 
 
 //mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
 mongoose.connect('mongodb://localhost/newLocalTest');
-
 
 
 // view engine setup

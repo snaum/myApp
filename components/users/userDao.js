@@ -28,10 +28,17 @@ class UserDao{
     }
 
     //TODO validate before save.
-    create(user){
+    create(userObj){
         //create new 
         var self = this;
 
+        var user = new User(userObj.email,
+            userObj.password, 
+            userObj.firstname, 
+            userObj.lastname, 
+            userObj.screename, 
+            userObj.language, 
+            userObj.phone);
         var p = new Promise(function(resolve, reject){
             self.users.create(user, function(err, newUser){
                 if(err){
@@ -39,14 +46,8 @@ class UserDao{
                     reject(err);
                 }
                 try{
-                    var u = new User(newUser.email,
-                                    newUser.password, 
-                                    newUser.firstname, 
-                                    newUser.lastname, 
-                                    newUser.screename, 
-                                    newUser.language, 
-                                    newUser.phone);
-                    resolve(u);
+                    user.setId(newUser.id);
+                    resolve(user);
                 } catch(err) {
                     console.error("invalid user:"+err);
                     reject(err);
@@ -63,8 +64,13 @@ class UserDao{
             if(err){
                 cb(err);
             }
-            let u = new User(user.id, user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
-            cb(null, u);
+            if (!user) {
+                cb(null, false, { message: 'Incorrect email.' });
+            }else{
+                let u = new User(user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+                u.setId(user.id);
+                cb(null, u);
+            }
         });
     }
 
@@ -74,7 +80,8 @@ class UserDao{
             if(err){
                 cb(err);
             }
-            let u = new User(user.id, user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+            let u = new User(user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+            u.setId(user.id);
             cb(null, u);
         });
     }

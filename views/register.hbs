@@ -1,9 +1,14 @@
 <h1>Register Page</h1>
-<p>Say something worthwhile here.</p>
+<p>Please register</p>
 <br/>
 <form action="/register" method="post" style='max-width: 300px;'>
-    <input type='text' name="username" placeholder='Enter Username'/>
+    <input type='email' name="email" placeholder='Enter email address'/>
     <input type='password' name="password" placeholder='Password'/>
+    <input type='text' name="firstname" placeholder='Enter First Name'/>
+    <input type='text' name="lastname" placeholder='Enter Last Name'/>
+    <input type='text' name="screenname" placeholder='Enter Screen Name'/>
+    <input type='text' name="phone" placeholder='Enter phone number'/>
+    <br/>
     <button type='submit' value='Submit'>Submit</button>
-     <button type='button' value='cancel'><a href="/"> Cancel </a></button>
+    <button type='button' value='cancel'><a href="/"> Cancel </a></button>
 </form>
