@@ -14,6 +14,7 @@ The boiler plate application provides a few features:
   provided by Reddis
 * Logging
   TBD
+  should be able to change log levels at runtime.
 * instrumentation and telemetry
   open zipkin
 * Service dicovery
