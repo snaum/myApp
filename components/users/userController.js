@@ -11,8 +11,8 @@ let router = express.Router();
 router.get('/', function(req, res, next) {
   
   let context = new RequestContext(req);
-  let user = new User('simon');
-  res.send("respond with a "+user.constructor.name+":"+user.getName());
+  //let user = new User('simon@simon.com');
+  res.send("respond with a "+req.user.constructor.name+":"+req.user.getEmail());
 });
 
 module.exports = router;

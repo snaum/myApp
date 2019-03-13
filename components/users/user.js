@@ -8,17 +8,35 @@ function validEmail(email){
     } 
 }
 
+/*
+factory method??
+
+function createUser(email, password, firstname, lastname, screename, language, phone) {
+    validateEmail(email)
+    return {
+        email: email,
+        password: password,
+        firstname: firstname,
+        lastname: lastname,
+        screename: screename,
+        language: language,
+        phone: phone
+    }
+}
+*/
+
 class User{
-    constructor(email, password){
+    constructor(id, email, password, firstname, lastname, screename, language, phone){
         validEmail(email);
 
+        this.id = id;
         this.email = email;
         this.password = password;
-        this.firstname;
-        this.lastname;
-        this.screenname;
-        this.language;
-        this.phone;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.screenname = screename;
+        this.language = language;
+        this.phone = phone;
 
         this.private; //other private
     }
@@ -33,6 +51,10 @@ class User{
             language: String,
             phone: Number
         }
+    }
+
+    getEmail(){
+        return this.email;
     }
 
 }

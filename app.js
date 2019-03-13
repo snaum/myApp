@@ -1,12 +1,17 @@
 const express = require('express');
+const app = express();
+
 const path = require('path');
 const favicon = require('serve-favicon');
 
-//logging morgan for http request and response, winston for log statements
+//morgan logs http request and response (access log), winston for log statements (debug, info, error...)
 //TODO: why???
 const winston = require('winston');
 winston.info("CHILL WINSTON! ... I put it in the logs.");
 const logger = require('morgan');
+//TODO: http request/response logging using morgan
+app.use(logger('combined'));
+
 
 //TODO: session management with Redis
 const session  = require('express-session');
@@ -40,15 +45,16 @@ limiter({
 })
 */
 
-const app = express();
+
 
 
 
 
 
 /* AUTHENTICATION */
-
+let authNHelper = require('./helpers/authNHelper');
 const passport = require('passport');
+
 var LocalStrategy = require('passport-local').Strategy;
 app.use(session({ 
 //  store: new RedisStore(options),
@@ -60,7 +66,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-let authNHelper = require('./helpers/authNHelper');
 passport.use(new LocalStrategy(
   function(username, password, done) {
     /*
@@ -102,9 +107,6 @@ app.use(helmet());
 //TODO generates a CSRF token for use in API and UI forms
 //app.use(csrf({ cookie: true }))
 
-//TODO: http request/response logging using morgan
-app.use(logger('combined'));
-
 app.use(compression());
 
 app.use(favicon(path.join(__dirname, 'ui', 'favicon-96x96.png')));
@@ -123,8 +125,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const landingPage = require('./controllers/landingPage');
 app.use('/', landingPage);
 
+const authN = require('./controllers/authNController');
+app.use('/', authN);
+
 const users = require('./components/users/userController');
-app.use('/users', users);
+app.use('/users', authNHelper.ensureAuthenticated, users);
 
 
 //error handlers

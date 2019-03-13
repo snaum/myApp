@@ -3,7 +3,6 @@ NOTES:
 userDAO is a SINGLETON!! the module.exports is the instance of the class.
 
 TODO: 
-separate concerns. register and authenticate should be in a separate file and depend on userDao. 
 UserDAO should only do CRUD and should map between User es6class and mongoose User object
 
 */
@@ -16,29 +15,68 @@ let Schema = mongoose.Schema;
 
 let User = require('./user');
 
-const schema = new Schema(User.getSchema());
+const userSchema = new Schema(User.getSchema());
 //schema.loadClass(User);
 
 class UserDao{
 
     constructor(){
-        this.users = mongoose.model('User', schema);
+        this.users = mongoose.model('User', userSchema);
+      //this.other = mongoose.model('other', otherSchema);
         this.test="test";
+
     }
 
-    create(user, cb){
-        //create new user
-        this.users.create(user, cb);
+    //TODO validate before save.
+    create(user){
+        //create new 
+        var self = this;
+
+        var p = new Promise(function(resolve, reject){
+            self.users.create(user, function(err, newUser){
+                if(err){
+                    console.error("error while saving to DB:"+err);
+                    reject(err);
+                }
+                try{
+                    var u = new User(newUser.email,
+                                    newUser.password, 
+                                    newUser.firstname, 
+                                    newUser.lastname, 
+                                    newUser.screename, 
+                                    newUser.language, 
+                                    newUser.phone);
+                    resolve(u);
+                } catch(err) {
+                    console.error("invalid user:"+err);
+                    reject(err);
+                }
+            });
+        });
+        return p;
     }
 
-    read(username, cb){
-        //get user by id
-        this.users.findOne({ username: username }, cb);
+    read(email, cb){
+        //get user by email
+        //this.users.findOne({ email: email }, cb);
+        this.users.findOne({ email: email }, function(err, user){
+            if(err){
+                cb(err);
+            }
+            let u = new User(user.id, user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+            cb(null, u);
+        });
     }
 
     readById(id, cb){
         //get user by id
-        this.users.findById(id, cb);
+        this.users.findById(id, function(err, user){
+            if(err){
+                cb(err);
+            }
+            let u = new User(user.id, user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+            cb(null, u);
+        });
     }
 
     list(cb){
