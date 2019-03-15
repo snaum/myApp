@@ -4,12 +4,16 @@ const app = express();
 const path = require('path');
 const favicon = require('serve-favicon');
 
+/*
 //morgan logs http request and response (access log), winston for log statements (debug, info, error...)
 const winston = require('winston');
 winston.info("CHILL WINSTON! ... I put it in the logs.");
-const logger = require('morgan');
-app.use(logger('combined'));
+*/
+const http_req_logger = require('morgan');
+app.use(http_req_logger('combined'));
 
+const logger = require('./helpers/logHelper');
+logger.info("logger is up");
 
 //TODO: session management with Redis
 const session  = require('express-session');
@@ -108,6 +112,14 @@ app.use('/', authN);
 
 const users = require('./components/users/userController');
 app.use('/users', passport.authenticate('jwt', { session : false }), users);
+
+//unautenticated
+const info = require('./components/monitoring/infoController');
+app.use('/info', info);
+
+//authenticated and ADMIN role
+const admin = require('./components/monitoring/adminController');
+app.use('/admin', passport.authenticate('jwt', { session : false }), admin);
 
 
 //error handlers

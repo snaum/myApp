@@ -1,4 +1,5 @@
 const userDao = require("../components/users/userDao");
+const logger = require('./logHelper');
 
 const crypto = require('crypto');
 
@@ -20,14 +21,17 @@ function authenticate(email, password, done){
 
 
 function register(userObj){
-    console.log("saving..."+JSON.stringify(userObj));
+    logger.debug("saving..."+JSON.stringify(userObj));
     var p = new Promise(function(resolve, reject){
         userDao.create(userObj).then(function(newUser){
-            console.log("saved:"+JSON.stringify(newUser));
+            logger.debug("saved:"+JSON.stringify(newUser));
             resolve(newUser);
         }, function(err){
-            console.error(err);
-            resolve(err);
+            logger.error("error: "+err);
+            let e = {
+                message: err
+            }
+            reject(e);
         });
     
     });

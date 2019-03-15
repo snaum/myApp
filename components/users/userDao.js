@@ -9,6 +9,7 @@ UserDAO should only do CRUD and should map between User es6class and mongoose Us
 
 
 
+const logger = require('../../helpers/logHelper');
 
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
@@ -32,27 +33,32 @@ class UserDao{
         //create new 
         var self = this;
 
-        var user = new User(userObj.email,
-            userObj.passwordHash, 
-            userObj.firstname, 
-            userObj.lastname, 
-            userObj.screename, 
-            userObj.language, 
-            userObj.phone);
+        
         var p = new Promise(function(resolve, reject){
-            self.users.create(user, function(err, newUser){
-                if(err){
-                    console.error("error while saving to DB:"+err);
-                    reject(err);
-                }
-                try{
-                    user.setId(newUser.id);
-                    resolve(user);
-                } catch(err) {
-                    console.error("invalid user:"+err);
-                    reject(err);
-                }
-            });
+            try{
+                var user = new User(
+                    userObj.email,
+                    userObj.passwordHash, 
+                    userObj.firstname, 
+                    userObj.lastname, 
+                    userObj.screenname, 
+                    userObj.language, 
+                    userObj.phone
+                );
+
+                self.users.create(user, function(err, newUser){
+                    if(err){
+                        logger.error("error while saving to DB:"+err);
+                        reject(err);
+                    }else{
+                        user.setId(newUser.id);
+                        resolve(user);
+                    }
+                });
+            } catch(err){
+                logger.error("invalid user:"+err);
+                reject(err);
+            }
         });
         return p;
     }
@@ -125,7 +131,7 @@ class UserDao{
         console.log("saving..."+JSON.stringify(user));
         this.users.create(user,function (err, user) {
             if (err) {
-                console.error(err);
+                logger.error(err);
                 throw (err);
             }
             else{

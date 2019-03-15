@@ -1,4 +1,5 @@
 const userDao = require("../components/users/userDao");
+const logger = require('./logHelper');
 const jwt = require("jsonwebtoken");
 
 const jwtoptions = {
@@ -21,13 +22,13 @@ function authenticate(id, done){
 
 //TODO hash password before saving
 function register(userObj){
-    console.log("saving..."+JSON.stringify(userObj));
+    logger.debug("saving..."+JSON.stringify(userObj));
     var p = new Promise(function(resolve, reject){
         userDao.create(userObj).then(function(newUser){
-            console.log("saved:"+JSON.stringify(newUser));
+            logger.debug("saved:"+JSON.stringify(newUser));
             resolve(newUser);
         }, function(err){
-            console.error(err);
+            logger.error(err);
             resolve(err);
         });
     
@@ -40,8 +41,8 @@ function createTokenAndPayload(user){
     }
     let token = jwt.sign(payload,'top_secret',jwtoptions);
     let decoded = jwt.decode(token, {complete: true});
-    console.log(decoded.header);
-    console.log(decoded.payload);
+    logger.debug(decoded.header);
+    logger.debug(decoded.payload);
     return { 
         jwt: token,
         payload: decoded.payload

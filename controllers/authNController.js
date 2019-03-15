@@ -5,6 +5,7 @@ const express = require('express');
 var passport = require('passport');
 let authNHelper = require('../helpers/authNHelper');
 let jwtHelper = require('../helpers/JWTauthNHelper');
+const logger = require('../helpers/logHelper');
 
 
 let router = express.Router();

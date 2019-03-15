@@ -13,11 +13,11 @@ The boiler plate application provides a few features:
 * Cache
   provided by Reddis
 * Logging
-  TBD
+  winston to stdout/stderr
   should be able to change log levels at runtime.
 * instrumentation and telemetry
   open zipkin
-* Service dicovery
+* Service discovery
   provided by Consul
 * Externalized config
   provided by Vault and Consul
@@ -25,6 +25,7 @@ The boiler plate application provides a few features:
   TBD (hystrix?)
 * rate limiter
   bottleneck
+* Spring Actuator-like features
 
 
 notes:
@@ -34,5 +35,13 @@ https://12factor.net/
 progressive web app (PWA)
 https://hackernoon.com/object-create-in-javascript-fa8674df6ed2
 
-
 https://medium.com/javascript-scene/javascript-factory-functions-vs-constructor-functions-vs-classes-2f22ceddf33e
+
+https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/production-ready-features.html#production-ready
+
+
+TODO:
+decouple UI/API
+RBAC
+health checks
+caching

@@ -1,4 +1,5 @@
-'use strict'
+'use strict';
+const logger = require('../../helpers/logHelper');
 
 const express = require('express');
 

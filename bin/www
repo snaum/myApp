@@ -9,13 +9,15 @@ var debug = require('debug')('myapp:server');
 var http = require('http');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
+const logger = require('../helpers/logHelper');
+
 
 if (cluster.isMaster) {
   for(var i=0; i<numCPUs; i++){
     cluster.fork();
   }
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
+    logger.info(`worker ${worker.process.pid} died`);
   });
 } else {
 
@@ -76,11 +78,11 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      logger.error(bind + ' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      logger.error(bind + ' is already in use');
       process.exit(1);
       break;
     default:
@@ -97,15 +99,15 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log('Listening on ' + bind);
+  logger.info('Listening on ' + bind);
   
 }
 
 process
   .on('unhandledRejection', (reason, p) => {
-    console.error(reason, 'Unhandled Rejection at Promise', p);
+    logger.error(reason, 'Unhandled Rejection at Promise', p);
   })
   .on('uncaughtException', err => {
-    console.error(err, 'Uncaught Exception thrown');
+    logger.error(err, 'Uncaught Exception thrown');
     process.exit(1);
   });
