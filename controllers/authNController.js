@@ -4,6 +4,8 @@ const express = require('express');
 
 var passport = require('passport');
 let authNHelper = require('../helpers/authNHelper');
+let jwtHelper = require('../helpers/JWTauthNHelper');
+
 
 let router = express.Router();
 
@@ -12,11 +14,13 @@ router.get('/register', function(req, res) {
   res.render('register', { });
 });
 
-router.post('/register', function(req, res) {
 
+//TODO input validation https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Password_Storage_Cheat_Sheet.md
+router.post('/register', function(req, res) {
+  let passwordHash  = authNHelper.passwordHasher(req.body.password);
   let userObj = {
      email : req.body.email,
-     password : req.body.password,
+     passwordHash : passwordHash,
      firstname : req.body.firstname,
      lastname : req.body.lastname,
      screenname : req.body.screenname,
@@ -43,10 +47,13 @@ router.post('/login', function(req, res, next) {
         if (!user) { 
             return res.render('login', { authError : {message: profile.message }}); 
         }
-        req.logIn(user, function(err) {
+        req.logIn(user, { session : false }, function(err) {
             if (err) { 
                 return next(err); 
             }
+            const tokenObj = jwtHelper.createToken(user);
+            res.cookie("jwt", tokenObj.jwt, {httpOnly:true, secure: true, sameSite:true});
+            res.cookie("user", tokenObj.payload, {secure: true, sameSite:true});
             return res.redirect('/');
         });
     })(req, res, next);

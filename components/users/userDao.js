@@ -33,7 +33,7 @@ class UserDao{
         var self = this;
 
         var user = new User(userObj.email,
-            userObj.password, 
+            userObj.passwordHash, 
             userObj.firstname, 
             userObj.lastname, 
             userObj.screename, 
@@ -67,7 +67,7 @@ class UserDao{
             if (!user) {
                 cb(null, false, { message: 'Incorrect email.' });
             }else{
-                let u = new User(user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+                let u = new User(user.email, user.passwordHash, user.firstname, user.lastname, user.screename, user.language, user.phone);
                 u.setId(user.id);
                 cb(null, u);
             }
@@ -80,7 +80,7 @@ class UserDao{
             if(err){
                 cb(err);
             }
-            let u = new User(user.email, user.password, user.firstname, user.lastname, user.screename, user.language, user.phone);
+            let u = new User(user.email, user.passwordHash, user.firstname, user.lastname, user.screename, user.language, user.phone);
             u.setId(user.id);
             cb(null, u);
         });

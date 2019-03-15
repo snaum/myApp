@@ -1,8 +1,11 @@
 const userDao = require("../components/users/userDao");
 
+const crypto = require('crypto');
+
+const SALT_LENGTH_BYTES = 64;
+
 
 function authenticate(email, password, done){
-
     userDao.read(email, function(err, user) {
         if (err) { return done(err); }
         if (!user) {
@@ -14,6 +17,7 @@ function authenticate(email, password, done){
         return done(null, user);
     });
 }
+
 
 function register(userObj){
     console.log("saving..."+JSON.stringify(userObj));
@@ -30,11 +34,26 @@ function register(userObj){
     return p;
 }
 function validatePassword(user, password){
-    //console.log("user="+JSON.stringify(user));
-    //console.log("password="+password);
-    return user.password === password;
+    let salt =  user.passwordHash.substring(0,SALT_LENGTH_BYTES*2);
+    const hash = crypto.createHash('sha512');
+    hash.update(salt+password);
+    let testHash = hash.digest('hex');
+    testHash = salt + testHash;
+    
+    return user.passwordHash === testHash;
 }
 
+function passwordHasher(password){
+    let salt = crypto.randomBytes(SALT_LENGTH_BYTES);
+    salt = salt.toString('hex');
+    const hash = crypto.createHash('sha512');
+    hash.update(salt+password);
+    let passwordHash = hash.digest('hex');
+    passwordHash = salt + passwordHash;
+    return passwordHash;
+}
+
+/*
 function serializeUser(user, done){
     console.log("...serializeUser...");
     done(null, user.getId());
@@ -46,6 +65,7 @@ function deserializeUser(id, done){
     })
 }
 
+
 function ensureAuthenticated(req, res, next){
     if (req.isAuthenticated()) {
         // req.user is available for use here
@@ -55,12 +75,16 @@ function ensureAuthenticated(req, res, next){
     // denied. redirect to login
     res.redirect('/logout')
 }
+*/
+
+
 
 module.exports = {
     authenticate: authenticate,
     register: register,
     validatePassword: validatePassword,
-    serializeUser: serializeUser,
-    deserializeUser: deserializeUser,
-    ensureAuthenticated: ensureAuthenticated
+    //serializeUser: serializeUser,
+   // deserializeUser: deserializeUser,
+    //ensureAuthenticated: ensureAuthenticated,
+    passwordHasher: passwordHasher
 }

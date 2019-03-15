@@ -26,11 +26,11 @@ function createUser(email, password, firstname, lastname, screename, language, p
 */
 
 class User{
-    constructor(email, password, firstname, lastname, screenname, language, phone){
+    constructor(email, passwordHash, firstname, lastname, screenname, language, phone){
         validEmail(email);
 
         this.email = email;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.firstname = firstname;
         this.lastname = lastname;
         this.screenname = screenname;
@@ -44,7 +44,7 @@ class User{
     static getSchema(){
         return {
             email: String,
-            password: String,
+            passwordHash: String,
             firstname: String,
             lastname: String,
             screenname: String,
@@ -63,6 +63,19 @@ class User{
 
     setId(id){
         this.id = id;
+    }
+
+    toJSON(){
+        return {
+            _id: this.id,
+            email: this.email,
+            //passwordHash: this.passwordHash,
+            firstname: this.firstname,
+            lastname: this.lastname,
+            screenname: this.screenname,
+            language: this.language,
+            phone: this.phone
+        }
     }
 
 }

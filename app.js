@@ -48,37 +48,28 @@ limiter({
 
 /* AUTHENTICATION */
 let authNHelper = require('./helpers/authNHelper');
+let jwtHelper = require('./helpers/JWTauthNHelper');
+
 const passport = require('passport');
-
-var LocalStrategy = require('passport-local').Strategy;
-app.use(session({ 
-//  store: new RedisStore(options),
-  secret: 'GdkDn5Zilu4zvBLmWJ0pIFvdclTwl9mXnU0aXAxIT6cCWnWbqkWyzjQzIdEwWSdx',
-  resave: true, 
-  saveUninitialized: true 
-}));
 app.use(passport.initialize());
-app.use(passport.session());
 
+var LocalStrategy = require('passport-local');
+var JwtStrategy = require('passport-jwt').Strategy;
+var ExtractJwt = require('passport-jwt').ExtractJwt;
+  
+var opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = 'top_secret';
+
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+  return jwtHelper.authenticate(jwt_payload.user._id, done);
+}));
 
 passport.use(new LocalStrategy(
-  function(username, password, done) {
-    /*
-    User.findOne({ username: username }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      if (!user.verifyPassword(password)) { return done(null, false); }
-      return done(null, user);
-    });
-    */
-    return authNHelper.authenticate(username, password, done);
+  function(email, password, done) {
+    return authNHelper.authenticate(email, password, done);
   }
 ));
-passport.serializeUser(authNHelper.serializeUser);
-passport.deserializeUser(authNHelper.deserializeUser);
-
-
-
 
 //mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
@@ -116,7 +107,7 @@ const authN = require('./controllers/authNController');
 app.use('/', authN);
 
 const users = require('./components/users/userController');
-app.use('/users', authNHelper.ensureAuthenticated, users);
+app.use('/users', passport.authenticate('jwt', { session : false }), users);
 
 
 //error handlers
