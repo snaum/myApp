@@ -10,6 +10,8 @@ router.get('/loglevel', function(req, res){
 });
 
 router.post('/loglevel', function(req, res){
+    let logLevel = req.body.level;
+    logger.setLogLevel(logLevel);
     res.status(200).send("ok");
 });
 

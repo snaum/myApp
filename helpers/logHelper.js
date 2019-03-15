@@ -7,6 +7,7 @@ class LoggingService{
         const logger = winston.createLogger({
             level: 'debug',
             format: winston.format.logstash(),
+            exitOnError: true,
             //defaultMeta: { service: 'user-service' },
             transports: [
                 new winston.transports.Console({ level: 'debug', stderrLevels:['error'] }),
@@ -17,6 +18,10 @@ class LoggingService{
         this.info = (...args) => logger.info(...args);
         this.warn = (...args) => logger.warn(...args);
         this.error = (...args) => logger.error(...args);
+
+        this.setLogLevel = function(logLevel){
+            logger.transports[0].level = logLevel;
+        }
 
         this.info("CHILL WINSTON! ... I put it in the logs.");
     }
